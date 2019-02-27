@@ -1,26 +1,38 @@
 import React, { Component } from 'react';
-import logo from './logo.svg';
+import { BrowserRouter as Router, Route, Link } from "react-router-dom";
 import './App.css';
+import { fetchUrl } from './data/api'
+
+import Header from './page/Header'
+import MainPage from './page/MainPage'
+import MatchDetail from './page/MatchDetail'
+import MatchList from './components/MatchList'
 
 class App extends Component {
+  constructor(props){
+    super(props)
+    this.state = {
+      dataFromFetch: null
+    }
+  }
+  async componentDidMount(){
+    const data = await fetchUrl('https://thai-pga.com/php/SNTshow.php')
+    this.setState({dataFromFetch: data})
+  }
   render() {
+    const matchDetailComponent = ({ match }) =>(
+      <MatchDetail
+        data={this.state.dataFromFetch}
+        matchParams={parseInt(match.params.matchindex)}/>
+    )
     return (
-      <div className="App">
-        <header className="App-header">
-          <img src={logo} className="App-logo" alt="logo" />
-          <p>
-            Edit <code>src/App.js</code> and save to reload.
-          </p>
-          <a
-            className="App-link"
-            href="https://reactjs.org"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Learn React
-          </a>
-        </header>
-      </div>
+      <Router>
+        <div>
+          <Header />
+          <Route exact path="/" render={()=><MainPage data={this.state.dataFromFetch}/>} />
+          <Route path="/match/:matchindex" component={matchDetailComponent}/>
+        </div>
+      </Router>
     );
   }
 }
