@@ -15,11 +15,8 @@ class MainPage extends Component {
   constructor(props){
     super(props)
     this.state = {
-      announcementIndex: 0
+      
     }
-  }
-  getannouncementIndex = (i) =>{
-    console.log(i);
   }
   render() {
     const { classes } = this.props;
@@ -28,8 +25,7 @@ class MainPage extends Component {
         <SlideShow
           autoPlay
           duration={5000}
-          data={this.props.data}
-          getIndex={this.getannouncementIndex}/>
+          data={this.props.data}/>
 
         <MatchList data={this.props.data}/>
       </div>

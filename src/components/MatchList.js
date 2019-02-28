@@ -3,7 +3,7 @@ import { BrowserRouter as Router, Route, Link } from "react-router-dom";
 import PropTypes from 'prop-types';
 import { withStyles } from '@material-ui/core/styles';
 
-import MatchCard from './MatchCard'
+import CardMatch from './Card/CardMatch'
 
 import Typography from '@material-ui/core/Typography';
 import Button from '@material-ui/core/Button';
@@ -59,7 +59,7 @@ function MatchList(props) {
       <div className={classes.grid} style={gridStyle}>
 
         { data ? data.map( (d,i) =>
-          <MatchCard key={d.matchname} data={d} index={i}/>
+          <CardMatch key={d.matchname} data={d} index={i}/>
         ):<Typography className={classes.signInTitle} variant="h4">
             Loading ...
           </Typography>

@@ -42,6 +42,10 @@ class MenuAppBar extends React.Component {
   handleMenuClose = () =>{
     this.setState({ anchorEl: null });
   }
+  handleLogout = () =>{
+    this.handleMenuClose()
+    this.props.doUnAuthenticate()
+  }
   appBarScroll = () =>{
     if(window.scrollY > 0){
       this.setState({navOpacity: .6})
@@ -56,8 +60,8 @@ class MenuAppBar extends React.Component {
     window.removeEventListener('scroll',this.appBarScroll)
   }
   render() {
-    const { classes, modalOpen, modalClose } = this.props;
-    const { anchorEl, auth, navOpacity } = this.state;
+    const { classes, modalOpen, modalClose, isAuthenticated } = this.props;
+    const { anchorEl, navOpacity } = this.state;
     const open = Boolean(anchorEl);
     return (
       <AppBar style={{opacity: navOpacity,transition: '.2s'}}>
@@ -67,13 +71,13 @@ class MenuAppBar extends React.Component {
               Thai-PGA
             </Typography>
           </Link>
-          <Button color="inherit" onClick={modalOpen}>Login</Button>
-          { auth && (
+          { !isAuthenticated ? <Button color="inherit" onClick={modalOpen}>Login</Button>:null}
+          { isAuthenticated ?(
             <div>
               <IconButton
                 aria-owns={open ? 'menu-appbar' : undefined}
                 aria-haspopup="true"
-                onClick={this.handleMenu.open}
+                onClick={this.handleMenu}
                 color="inherit"
               >
                 <AccountCircle />
@@ -92,11 +96,18 @@ class MenuAppBar extends React.Component {
                 open={open}
                 onClose={this.handleMenu}
               >
-                <MenuItem onClick={this.handleMenuClose}>Profile</MenuItem>
-                <MenuItem onClick={this.handleMenuClose}>My account</MenuItem>
+                { isAuthenticated && (window.location.pathname === '/') ?
+                  <Link to='/user' style={{ textDecoration: 'none',color: 'white' }}>
+                    <MenuItem onClick={this.handleMenuClose}>MyAccount</MenuItem>
+                  </Link>:
+                  <Link to='/' style={{ textDecoration: 'none',color: 'white' }}>
+                    <MenuItem onClick={this.handleMenuClose}>Home</MenuItem>
+                  </Link>
+                }
+                <MenuItem onClick={this.handleLogout}>Log out</MenuItem>
               </Menu>
             </div>
-          )}
+          ):null}
         </Toolbar>
       </AppBar>
     );

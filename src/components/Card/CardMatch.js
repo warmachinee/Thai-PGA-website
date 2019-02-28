@@ -39,7 +39,7 @@ const styles = {
   }
 };
 
-function MatchCard(props) {
+function CardMatch(props) {
   const { classes, data } = props;
   const [ rf, refresh ] = useState(0)
   const cardStyle = {
@@ -80,9 +80,9 @@ function MatchCard(props) {
   );
 }
 
-MatchCard.propTypes = {
+CardMatch.propTypes = {
   classes: PropTypes.object.isRequired,
   data: PropTypes.object.isRequired
 };
 
-export default withStyles(styles)(MatchCard);
+export default withStyles(styles)(CardMatch);

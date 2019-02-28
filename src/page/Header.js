@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { withStyles } from '@material-ui/core/styles';
 
 import AppBar from '../components/AppBar'
-import TabsMenu from '../components/TabsMenu'
+import TabsMenu from '../components/Tabs/TabsMenu'
 
 import Modal from '@material-ui/core/Modal';
 import Typography from '@material-ui/core/Typography';
@@ -35,7 +35,9 @@ const Dialog = withStyles(styles)(
           open={modalState}
           onClose={close}>
           <div className={classes.dialog}>
-            <TabsMenu />
+            <TabsMenu
+              onClose={close}
+              doAuthenticate={this.props.doAuthenticate}/>
           </div>
         </Modal>
       );
@@ -52,16 +54,19 @@ class Header extends Component {
   handleModalClose = () => {
     this.setState({ modalState: false });
   };
-  
+
   render() {
-    const { classes } = this.props;
+    const { classes, isAuthenticated } = this.props;
     const { modalState } = this.state;
     return (
       <div className={classes.root}>
         <AppBar
+          isAuthenticated={isAuthenticated}
+          doUnAuthenticate={this.props.doUnAuthenticate}
           modalOpen={this.handleModal}
           modalClose={this.handleModalClose}/>
         <Dialog
+          doAuthenticate={this.props.doAuthenticate}
           modalState={modalState}
           close={this.handleModalClose}/>
       </div>

@@ -1,7 +1,15 @@
 import React from 'react';
+import {
+  BrowserRouter as Router,
+  Route,
+  Link,
+  Switch,
+  Redirect
+} from "react-router-dom";
 import PropTypes from 'prop-types';
 import { withStyles } from '@material-ui/core/styles';
 import SwipeableViews from 'react-swipeable-views';
+import { fetchPostUrl } from '../../data/api'
 
 import AppBar from '@material-ui/core/AppBar';
 import Tabs from '@material-ui/core/Tabs';
@@ -30,8 +38,6 @@ const styles = theme => ({
     marginRight: theme.spacing.unit * 4,
   },
   signInBtn: {
-    marginLeft: theme.spacing.unit * 4,
-    marginRight: theme.spacing.unit * 4,
     marginTop: '2rem',
     marginBottom: '2rem',
     width: '100%',
@@ -51,6 +57,8 @@ const styles = theme => ({
 class TabsMenu extends React.Component {
   state = {
     value: 0,
+    username: null,
+    password: null
   };
 
   handleChange = (event, value) => {
@@ -60,7 +68,14 @@ class TabsMenu extends React.Component {
   handleChangeIndex = index => {
     this.setState({ value: index });
   };
-
+  handleSignIn = async () =>{
+    const data = await fetchPostUrl('https://thai-pga.com/login',{
+      username: this.state.username,
+      password: this.state.password
+    })
+    this.props.onClose()
+    this.props.doAuthenticate(data)
+  }
   render() {
     const { classes, theme, label, component } = this.props;
     const SignIn = (
@@ -78,8 +93,8 @@ class TabsMenu extends React.Component {
             autoComplete="email"
             margin="normal"
             variant="outlined"
-            style={{width: '100%'}}
-          />
+            onChange={(e)=>this.setState({username: e.target.value})}
+            style={{width: '100%'}}/>
           <TextField
             id="outlined-password-input"
             label="Password"
@@ -88,11 +103,20 @@ class TabsMenu extends React.Component {
             autoComplete="current-password"
             margin="normal"
             variant="outlined"
-            style={{width: '100%'}}
-          />
-          <Fab variant="extended" color="primary" aria-label="Add" className={classes.signInBtn}>
-            Sign in
-          </Fab>
+            onChange={(e)=>this.setState({password: e.target.value})}
+            style={{width: '100%'}}/>
+          <Link
+            style={{ textDecoration: 'none', width: '100%',
+              marginLeft: theme.spacing.unit * 4,
+              marginRight: theme.spacing.unit * 4,
+            }}
+            to='/user'>
+            <Fab variant="extended" color="primary" aria-label="Add"
+              onClick={this.handleSignIn}
+              className={classes.signInBtn}>
+              Sign in
+            </Fab>
+          </Link>
         </form>
       </div>
     );

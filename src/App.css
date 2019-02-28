@@ -49,3 +49,7 @@ table {
 div {
   font-family: Roboto, sans-serif;
 }
+.sticky {
+	position: -webkit-sticky !important;
+  position: sticky !important;
+}

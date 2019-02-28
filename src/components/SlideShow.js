@@ -88,9 +88,16 @@ function SlideShow(props){
       position: 'absolute',
       zIndex: '10',
       background: 'black',
-      opacity:'.4',
+      opacity:'.6',
       color: 'white',
-      bottom: '0'
+      bottom: '0',
+      margin: 'auto',
+      textAlign: 'center',
+      padding: '1rem 0',
+      width: sliderItemSize.width,
+      textOverflow: 'ellipsis',
+      overflow: 'hidden',
+      whiteSpace: 'nowrap',
     }
   }
 
@@ -141,13 +148,14 @@ function SlideShow(props){
           style={style.slideList}>
           { data?
             data.map((d,i)=>
-            <div key={i} style={style.item}>
-              <img
-                onClick={()=>props.getIndex(i)}
-                src={d.img}
-                style={{ width: '100%',height: '100%'}}/>
-              <div style={style.imgTitle}>Test Index Number {i}</div>
-            </div>
+            <Link to={`/match/${i}`} style={{ textDecoration: 'none'}}>
+              <div key={i} style={style.item}>
+                <img
+                  src={d.img}
+                  style={{ width: '100%',height: '100%'}}/>
+                <div style={style.imgTitle}>{d.fieldname}</div>
+              </div>
+            </Link>
             ):<img style={{ width: '100%',height: '100%'}} />
           }
         </div>
