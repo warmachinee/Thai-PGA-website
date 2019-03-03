@@ -4,6 +4,8 @@ import PropTypes from 'prop-types';
 import { withStyles } from '@material-ui/core/styles';
 import { fetchUrl } from '../data/api'
 
+import MatchRegistrationForm from '../components/MatchRegistrationForm'
+
 import IconButton from '@material-ui/core/IconButton';
 import ArrowBackIcon from '@material-ui/icons/ArrowBack';
 import Typography from '@material-ui/core/Typography';
@@ -60,7 +62,7 @@ const styles = theme => ({
   },
 });
 function MatchDetail(props){
-  const { classes, matchParams, data } = props;
+  const { classes, matchParams, urlParams, data } = props;
   const [ dataGrouped, setDataGrouped ] = useState(null)
   const mediaStyle = {
     backgroundSize: 'cover',
@@ -260,10 +262,11 @@ function MatchDetail(props){
         </ExpansionPanel>
       )
     }
+
     return(
       <ExpansionPanel>
         <ExpansionPanelSummary expandIcon={<ExpandMoreIcon />}>
-          <Typography>Score board ({data[0].departname})</Typography>
+          <Typography>Score board ({data.length? data[0].departname: 'none'})</Typography>
         </ExpansionPanelSummary>
         <ExpansionPanelDetails style={{padding: 8,flexDirection: 'column'}}>
           <ExpansionPanel
@@ -305,13 +308,15 @@ function MatchDetail(props){
         for(var j = 0;j < data[matchParams].userid.length;j++){
           obj.push({
             departno: data[matchParams].departno[j],
-            departname: data[matchParams].departname[j],
+            departname: data[matchParams].departname ? data[matchParams].departname[j]: 'none',
             full: data[matchParams].full[j],
             last: data[matchParams].last[j],
-            in: data[matchParams].in[j],
-            out: data[matchParams].out[j],
-            gross: data[matchParams].gross[j],
-            holescore: data[matchParams].holescore[j],
+            in: data[matchParams].in ? data[matchParams].in[j]: 0,
+            out: data[matchParams].out ? data[matchParams].out[j]: 0,
+            gross: data[matchParams].gross ? data[matchParams].gross[j]: 0,
+            holescore:
+            data[matchParams].holescore ?
+            data[matchParams].holescore[j]: [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
           })
         }
         const filtered = obj.filter((d)=>{
@@ -323,8 +328,8 @@ function MatchDetail(props){
     }
   },[ ])
 
-  return(
-    <div className={classes.root}>
+  const Main = ({ match }) =>{
+    return(
       <Paper className={classes.paper} elevation={4}>
         <Link to='/' style={{ textDecoration: 'none',marginRight: '2rem' }}>
           <IconButton>
@@ -347,6 +352,31 @@ function MatchDetail(props){
           ):<p>Loading ...</p>}
         </div>
       </Paper>
+    );
+  }
+
+  const Registration = ({ match }) =>{
+    return(
+      <Paper className={classes.paper} elevation={4}>
+        <Link to='/' style={{ textDecoration: 'none',marginRight: '2rem' }}>
+          <IconButton>
+            <ArrowBackIcon fontSize="large"/>
+          </IconButton>
+        </Link>
+        <div className={classes.contentGrid}>
+          <Typography variant="h5" component="h3">
+            Registration
+          </Typography>
+          <MatchRegistrationForm />
+        </div>
+      </Paper>
+    )
+  }
+  return(
+    <div className={classes.root}>
+
+      <Route exact path={`${urlParams.path}/`} component={Main} />
+      <Route path={`${urlParams.path}/registration`} component={Registration} />
     </div>
   );
 }

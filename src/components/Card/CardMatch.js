@@ -20,6 +20,7 @@ const palette = {
 }
 const styles = {
   card: {
+    width: '100%',
     maxWidth: 345,
     minWidth: 250,
     margin: 'auto',

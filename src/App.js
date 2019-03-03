@@ -50,6 +50,7 @@ class App extends Component {
     const matchDetailComponent = ({ match }) =>(
       <MatchDetail
         data={this.state.dataFromFetch}
+        urlParams={match}
         matchParams={parseInt(match.params.matchindex)}/>
     )
     const PrivateRoute = ({ component: Component, ...rest }) => (
@@ -59,16 +60,12 @@ class App extends Component {
           this.state.isAuthenticated ? (
             <UserPage data={ dataAfterAuthen ? dataAfterAuthen:null }/>
           ) : (
-            <Redirect
-              to={{
-                pathname: "/",
-                state: { from: props.location }
-              }}
-            />
+            <Redirect to='/' />
           )
         }
       />
     );
+
     return (
       <Router>
         <div>
@@ -76,7 +73,6 @@ class App extends Component {
             isAuthenticated={this.state.isAuthenticated}
             doAuthenticate={this.doAuthenticate}
             doUnAuthenticate={this.doUnAuthenticate}/>
-
           <Route exact path="/"
             render={ ()=><MainPage data={this.state.dataFromFetch}/> }
           />

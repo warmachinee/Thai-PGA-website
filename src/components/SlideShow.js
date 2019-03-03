@@ -5,11 +5,18 @@ import Icon from '@material-ui/core/Icon';
 import IconButton from '@material-ui/core/IconButton';
 import ArrowBackIcon from '@material-ui/icons/ArrowBack';
 import ArrowForwardIcon from '@material-ui/icons/ArrowForward';
+import LinearProgress from '@material-ui/core/LinearProgress';
 
 const styles = {
   arrowColor: {
     color: 'white',
   },
+  progress: {
+    position: 'absolute',
+    bottom: 0,
+    width: '100%',
+    zIndex: 10
+  }
 };
 
 function SlideShow(props){
@@ -18,6 +25,7 @@ function SlideShow(props){
   const [ itemIndex, setItemIndex ] = useState(0)
   const [ sliderPosition, setSliderPosition ] = useState(0)
   const [ intervalId, setIntervalId ] = useState(null)
+  const [ imgLoaded, setImgLoaded ] = useState([])
   const [ rf, refresh ] = useState(0)
 
   function sliderSizeWidth(){
@@ -95,6 +103,7 @@ function SlideShow(props){
       textAlign: 'center',
       padding: '1rem 0',
       width: sliderItemSize.width,
+      maxWidth: 900,
       textOverflow: 'ellipsis',
       overflow: 'hidden',
       whiteSpace: 'nowrap',
@@ -119,6 +128,11 @@ function SlideShow(props){
   function resizeEffect(){
     refresh(rf + 1)
   }
+  function handleImgLoaded(){
+    for(var i = 0;i < 4;i++){
+      imgLoaded[i] = false
+    }
+  }
 
   useEffect(()=>{
     setSliderPosition( itemIndex*sliderItemSize.width )
@@ -129,6 +143,9 @@ function SlideShow(props){
       window.removeEventListener('resize',resizeEffect)
     }
   },[ itemIndex, window.innerWidth ])
+  useEffect(()=>{
+    handleImgLoaded()
+  },[ ])
   return(
     <div style={style.container}>
       <div style={style.slide}>
@@ -144,6 +161,7 @@ function SlideShow(props){
           style={style.rightArrow}>
           <ArrowForwardIcon fontSize="large"/>
         </IconButton>
+        { !imgLoaded.every( item => item === true )? <LinearProgress className={classes.progress}/>:null }
         <div
           style={style.slideList}>
           { data?
@@ -152,11 +170,17 @@ function SlideShow(props){
               <div key={i} style={style.item}>
                 <img
                   src={d.img}
+                  onLoad={imgLoaded[i] = true}
                   style={{ width: '100%',height: '100%'}}/>
                 <div style={style.imgTitle}>{d.fieldname}</div>
               </div>
             </Link>
-            ):<img style={{ width: '100%',height: '100%'}} />
+            ):
+            <div style={style.item}>
+              <img
+                style={{ width: '100%',height: '100%'}}/>
+              <div style={style.imgTitle}>Loading ....</div>
+            </div>
           }
         </div>
       </div>

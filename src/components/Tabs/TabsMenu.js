@@ -105,18 +105,11 @@ class TabsMenu extends React.Component {
             variant="outlined"
             onChange={(e)=>this.setState({password: e.target.value})}
             style={{width: '100%'}}/>
-          <Link
-            style={{ textDecoration: 'none', width: '100%',
-              marginLeft: theme.spacing.unit * 4,
-              marginRight: theme.spacing.unit * 4,
-            }}
-            to='/user'>
-            <Fab variant="extended" color="primary" aria-label="Add"
-              onClick={this.handleSignIn}
-              className={classes.signInBtn}>
-              Sign in
-            </Fab>
-          </Link>
+          <Fab variant="extended" color="primary" aria-label="Add"
+            onClick={this.handleSignIn}
+            className={classes.signInBtn}>
+            Sign in
+          </Fab>
         </form>
       </div>
     );

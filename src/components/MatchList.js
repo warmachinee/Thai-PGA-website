@@ -7,13 +7,15 @@ import CardMatch from './Card/CardMatch'
 
 import Typography from '@material-ui/core/Typography';
 import Button from '@material-ui/core/Button';
+import CircularProgress from '@material-ui/core/CircularProgress';
+
 import blue from '@material-ui/core/colors/blue';
 
 const palette = {
   signInBtn: blue['A700'],
   text: blue[800]
 }
-const styles = {
+const styles = theme => ({
   root: {
 
   },
@@ -22,8 +24,12 @@ const styles = {
   },
   title: {
     padding: '8px 40px'
-  }
-};
+  },
+  progress: {
+    margin: 'auto',
+    marginLeft: 8
+  },
+});
 
 function MatchList(props) {
   const { classes, data } = props;
@@ -50,19 +56,28 @@ function MatchList(props) {
       window.removeEventListener('resize',resizeEffect)
     }
   },[ window.innerWidth ])
-
   return (
     <div className={classes.root}>
-      <Button variant="outlined" color="inherit" className={classes.title} style={titleStyle}>
-        Match list
-      </Button>
+      <div style={{ display: 'flex'}}>
+        <Button variant="outlined" color="inherit" className={classes.title} style={titleStyle}>
+          Match list
+        </Button>
+        { !data?
+          <div className={classes.progress}>
+            <CircularProgress style={{ color: palette.text}}/>
+          </div>:null
+        }
+      </div>
       <div className={classes.grid} style={gridStyle}>
-
         { data ? data.map( (d,i) =>
           <CardMatch key={d.matchname} data={d} index={i}/>
-        ):<Typography className={classes.signInTitle} variant="h4">
-            Loading ...
-          </Typography>
+        ):
+          <CardMatch data={{
+              matchname: 'testcard',
+              datamatch: '01/01/2019',
+              img: null,
+              fieldname: 'test field'
+            }}/>
         }
       </div>
     </div>
