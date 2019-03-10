@@ -4,6 +4,7 @@ import { withStyles } from '@material-ui/core/styles';
 
 import AppBar from '../components/AppBar'
 import TabsMenu from '../components/Tabs/TabsMenu'
+import SnackBarAlert from '../components/SnackBarAlert'
 
 import Modal from '@material-ui/core/Modal';
 import Typography from '@material-ui/core/Typography';
@@ -28,16 +29,46 @@ const styles = theme => ({
 
 const Dialog = withStyles(styles)(
   class extends React.Component<Props> {
+    state = {
+      snackBarState: false,
+      snackBarMessage: null,
+      snackBarVariant: null
+    }
+    handleLoginStatus = (d) =>{
+      if(d){
+        if(d === 'success'){
+
+        }
+        else{
+          this.setState({
+            snackBarState: true,
+            snackBarMessage: d,
+            snackBarVariant: 'error'
+          })
+        }
+      }
+    }
     render() {
       const { classes, open, close, modalState } = this.props
+      const { snackBarState, snackBarMessage, snackBarVariant } = this.state
       return (
         <Modal
           open={modalState}
           onClose={close}>
-          <div className={classes.dialog}>
-            <TabsMenu
-              onClose={close}
-              doAuthenticate={this.props.doAuthenticate}/>
+          <div>
+            <div className={classes.dialog}>
+              <TabsMenu
+                onClose={close}
+                handleLoginStatus={this.handleLoginStatus}
+                doAuthenticate={this.props.doAuthenticate}
+                doAdminAuthenticate={this.props.doAdminAuthenticate}/>
+            </div>
+            <SnackBarAlert
+              variant={snackBarVariant}
+              autoHideDuration={2000}
+              open={snackBarState}
+              onClose={()=>this.setState({ snackBarState: false })}
+              message={snackBarMessage}/>
           </div>
         </Modal>
       );
@@ -56,17 +87,20 @@ class Header extends Component {
   };
 
   render() {
-    const { classes, isAuthenticated } = this.props;
+    const { classes, isAuthenticated, isAdminAuthenticated } = this.props;
     const { modalState } = this.state;
     return (
       <div className={classes.root}>
         <AppBar
           isAuthenticated={isAuthenticated}
+          isAdminAuthenticated={isAdminAuthenticated}
           doUnAuthenticate={this.props.doUnAuthenticate}
+          doAdminUnAuthenticate={this.props.doAdminUnAuthenticate}
           modalOpen={this.handleModal}
           modalClose={this.handleModalClose}/>
         <Dialog
           doAuthenticate={this.props.doAuthenticate}
+          doAdminAuthenticate={this.props.doAdminAuthenticate}
           modalState={modalState}
           close={this.handleModalClose}/>
       </div>

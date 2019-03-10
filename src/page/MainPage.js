@@ -4,7 +4,7 @@ import PropTypes from 'prop-types';
 import { withStyles } from '@material-ui/core/styles';
 
 import SlideShow from '../components/SlideShow'
-import MatchList from '../components/MatchList'
+import MatchList, { MatchListPaper } from '../components/MatchList'
 
 const styles = {
   root: {
@@ -15,7 +15,7 @@ class MainPage extends Component {
   constructor(props){
     super(props)
     this.state = {
-      
+
     }
   }
   render() {
@@ -26,8 +26,9 @@ class MainPage extends Component {
           autoPlay
           duration={5000}
           data={this.props.data}/>
-
-        <MatchList data={this.props.data}/>
+        <MatchListPaper>
+          <MatchList data={this.props.data}/>
+        </MatchListPaper>
       </div>
     );
   }

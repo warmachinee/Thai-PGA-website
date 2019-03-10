@@ -44,9 +44,9 @@ const styles = theme => ({
     fontSize: 14,
   },
   card: {
+    width: '80%',
     maxWidth: 240,
     marginTop: theme.spacing.unit * 4,
-    marginBottom: theme.spacing.unit * 4,
     margin: 'auto',
   },
   table: {
@@ -157,7 +157,11 @@ class TabsOverview extends React.Component {
           index={this.state.value}
           onChangeIndex={this.handleChangeIndex}
         >
-          <div dir={theme.direction} style={{ display: 'grid', gridTemplateColumns: window.innerWidth > 540 ? 'auto auto':'auto'}}>
+          <div dir={theme.direction}
+            style={{
+              display: 'grid',
+              paddingBottom: 32,
+              gridTemplateColumns: window.innerWidth > 540 ? 'auto auto':'auto'}}>
             {OverviewContent}
           </div>
           <div dir={theme.direction} style={{ paddingTop: 8 }}>

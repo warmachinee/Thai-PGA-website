@@ -21,7 +21,7 @@ const palette = {
 const styles = {
   card: {
     width: '100%',
-    maxWidth: 345,
+    maxWidth: 320,
     minWidth: 250,
     margin: 'auto',
   },
@@ -45,7 +45,7 @@ function CardMatch(props) {
   const [ rf, refresh ] = useState(0)
   const cardStyle = {
     marginTop: window.innerWidth > 330? '5%':'10%',
-    marginBottom: window.innerWidth > 330? '5%':'10%'
+    marginBottom: window.innerWidth > 330? '5%':'10%',
   }
   function resizeEffect(){
     refresh(rf + 1)
@@ -63,6 +63,7 @@ function CardMatch(props) {
         subheader={data.datematch}/>
       <CardActionArea>
         <CardMedia
+          style={{ ...props.mediaStyle }}
           className={classes.media}
           image={data.img}
           title="Contemplative Reptile"/>

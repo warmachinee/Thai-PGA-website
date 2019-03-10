@@ -46,6 +46,10 @@ class MenuAppBar extends React.Component {
     this.handleMenuClose()
     this.props.doUnAuthenticate()
   }
+  handleAdminLogout = () =>{
+    this.handleMenuClose()
+    this.props.doAdminUnAuthenticate()
+  }
   appBarScroll = () =>{
     if(window.scrollY > 0){
       this.setState({navOpacity: .6})
@@ -60,7 +64,7 @@ class MenuAppBar extends React.Component {
     window.removeEventListener('scroll',this.appBarScroll)
   }
   render() {
-    const { classes, modalOpen, modalClose, isAuthenticated } = this.props;
+    const { classes, modalOpen, modalClose, isAuthenticated, isAdminAuthenticated } = this.props;
     const { anchorEl, navOpacity } = this.state;
     const open = Boolean(anchorEl);
     return (
@@ -71,7 +75,10 @@ class MenuAppBar extends React.Component {
               Thai-PGA
             </Typography>
           </Link>
-          { !isAuthenticated ? <Button color="inherit" onClick={modalOpen}>Login</Button>:null}
+          { !isAuthenticated?
+            ( !isAdminAuthenticated ? <Button color="inherit" onClick={modalOpen}>Login</Button>:null )
+            :null
+          }
           { isAuthenticated ?(
             <div>
               <IconButton
@@ -105,6 +112,34 @@ class MenuAppBar extends React.Component {
                   </Link>
                 }
                 <MenuItem onClick={this.handleLogout}>Log out</MenuItem>
+              </Menu>
+            </div>
+          ):null}
+          { isAdminAuthenticated?(
+            <div>
+              <IconButton
+                aria-owns={open ? 'menu-appbar' : undefined}
+                aria-haspopup="true"
+                onClick={this.handleMenu}
+                color="inherit"
+              >
+                <AccountCircle />
+              </IconButton>
+              <Menu
+                id="menu-appbar"
+                anchorEl={anchorEl}
+                anchorOrigin={{
+                  vertical: 'top',
+                  horizontal: 'right',
+                }}
+                transformOrigin={{
+                  vertical: 'top',
+                  horizontal: 'right',
+                }}
+                open={open}
+                onClose={this.handleMenu}
+              >
+                <MenuItem onClick={this.handleAdminLogout}>Log out</MenuItem>
               </Menu>
             </div>
           ):null}
