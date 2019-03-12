@@ -184,7 +184,8 @@ class TabsMenu extends React.Component {
           this.props.onClose()
           this.props.doAuthenticate(data)
         }else{
-          this.props.handleLoginStatus('Please use nomal account')
+          this.props.onClose()
+          this.props.doAdminAuthenticate(data)
         }
       }else{
         this.props.handleLoginStatus(data.status)

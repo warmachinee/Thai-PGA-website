@@ -392,12 +392,12 @@ function MatchDetail(props){
                 fontSize: window.innerWidth > 500? 16:12,
                 border: `1.5px solid ${grey[700]}`, padding: window.innerWidth > 500? '8px 4px':'8px 4px',
                 marginRight: 4
-              }}>Under</div>
+              }}>Over</div>
             <div style={{
                 fontSize: window.innerWidth > 500? 16:12,
-                border: `1.5px solid ${grey[700]}`, padding: window.innerWidth > 500? '10px 2px':'10px 4px',
+                border: `1.5px solid ${grey[700]}`, padding: window.innerWidth > 500? '12px 2px':'12px 4px',
                 borderRadius: '50%'
-              }}>Over</div>
+              }}>Under</div>
             <div style={{ flex: 1}}></div>
             <Chip
               label="Hole"
