@@ -85,17 +85,6 @@ class MatchEditorDialog extends React.Component {
   handleDelete = () =>{
     this.fetchDeleteMatch()
   }
-  handleMatchDisplay = () =>{
-    this.fetchMatchDisplay()
-  }
-  async fetchMatchDisplay(){
-    const data = await fetchPostUrl('https://thai-pga.com/api/matchcheckdisplay',{
-      userid: parseInt(this.props.adminData.id),
-      matchid: this.props.matchEditorData.matchid,
-
-    })
-    console.log(data);
-  }
   async fetchDeleteMatch(){
     const data = await fetchPostUrl('https://thai-pga.com/api/matchdelete',{
       userid: parseInt(this.props.adminData.id),
@@ -117,9 +106,12 @@ class MatchEditorDialog extends React.Component {
     let tempData = []
     for(var i = 0;i < match.matchid.length;i++){
       tempData.push({
+        i: i,
         matchid: match.matchid[i],
         matchname: match.matchname[i],
         date: match.date[i],
+        fieldname: match.fieldname[i],
+        display: match.display[i]
       })
     }
     this.props.afterEditor(tempData)
@@ -131,7 +123,7 @@ class MatchEditorDialog extends React.Component {
     return (
       <Modal
         open={modalState}
-        onClose={close}
+        onClose={this.handleClose}
       >
         <div className={classes.dialog}>
           <div className={classes.dialogTitle}>
@@ -145,9 +137,7 @@ class MatchEditorDialog extends React.Component {
           <Divider variant="middle" />
           { !deleteMatchState ?
             <div>
-              <Button
-                className={classes.cancelButton}
-                onClick={this.handleMatchDisplay}>Display</Button>
+              Edit match
               <SnackBarAlert
                 variant={snackBarVariant}
                 autoHideDuration={2000}

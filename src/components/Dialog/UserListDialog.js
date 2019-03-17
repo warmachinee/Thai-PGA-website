@@ -21,6 +21,8 @@ import ListItemSecondaryAction from '@material-ui/core/ListItemSecondaryAction';
 import CloseIcon from '@material-ui/icons/Close';
 import SearchIcon from '@material-ui/icons/Search';
 import AddBoxIcon from '@material-ui/icons/AddBox';
+import KeyboardArrowDownIcon from '@material-ui/icons/KeyboardArrowDown';
+import KeyboardArrowUpIcon from '@material-ui/icons/KeyboardArrowUp';
 
 import blue from '@material-ui/core/colors/blue';
 
@@ -96,6 +98,9 @@ class UserListDialog extends React.Component {
       return { userListVisible: prev.userListVisible + 10 }
     })
   }
+  handleUserListLoadless = () =>{
+    this.setState({ userListVisible: 10 })
+  }
   async fetchAddPlayer(player){
     const data = await fetchPostUrl('https://thai-pga.com/api/matchadduser',{
       userid: parseInt(this.props.adminData.id),
@@ -127,7 +132,8 @@ class UserListDialog extends React.Component {
         index: i,
         userid: user.userid[i],
         fullname: user.fullname[i],
-        lastname: user.lastname[i]
+        lastname: user.lastname[i],
+        display: user.display[i]
       })
     }
     for(var i = 0;i < user.classname.length;i++){
@@ -199,12 +205,24 @@ class UserListDialog extends React.Component {
                 ) :<p>Loading ...</p>
               }
             </List>
-            { userListData ?
-              userListVisible < userListData.length &&
+            { userListData &&
+              userListVisible < userListData.length ?
               <Button
                 fullWidth
-                onClick={this.handleUserListLoadmore}
-                className={classes.loadmoreButton}>Loadmore</Button>:null
+                className={classes.loadmoreButton}
+                onClick={this.handleUserListLoadmore}>
+                <IconButton disabled>
+                  <KeyboardArrowDownIcon disabled />
+                </IconButton>
+              </Button>:
+              <Button
+                fullWidth
+                className={classes.loadmoreButton}
+                onClick={this.handleUserListLoadless}>
+                <IconButton disabled>
+                  <KeyboardArrowUpIcon disabled />
+                </IconButton>
+              </Button>
             }
           </div>
           <SnackBarAlert

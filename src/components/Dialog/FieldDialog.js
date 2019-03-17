@@ -23,6 +23,8 @@ import CloseIcon from '@material-ui/icons/Close';
 import AddBoxIcon from '@material-ui/icons/AddBox';
 import EditIcon from '@material-ui/icons/Edit';
 import DeleteIcon from '@material-ui/icons/Delete';
+import KeyboardArrowDownIcon from '@material-ui/icons/KeyboardArrowDown';
+import KeyboardArrowUpIcon from '@material-ui/icons/KeyboardArrowUp';
 
 import blue from '@material-ui/core/colors/blue';
 
@@ -166,6 +168,9 @@ class FieldDialog extends React.Component {
       return { visible: prev.visible + 10}
     })
   }
+  handleLoadless = () =>{
+    this.setState({ visible: 10})
+  }
 
   async fetchLoadField(){
     const field = await fetchUrl('https://thai-pga.com/api/loadfield')
@@ -297,12 +302,24 @@ class FieldDialog extends React.Component {
               }
             </List>
           </div>
-          { fieldData ?
-            visible < fieldData.length &&
+          { fieldData &&
+            visible < fieldData.length ?
             <Button
-              color="primary"
+              fullWidth
               className={classes.loadmoreButton}
-              onClick={this.handleLoadmore}>Loadmore</Button>:null
+              onClick={this.handleLoadmore}>
+              <IconButton disabled>
+                <KeyboardArrowDownIcon disabled />
+              </IconButton>
+            </Button>:
+            <Button
+              fullWidth
+              className={classes.loadmoreButton}
+              onClick={this.handleLoadless}>
+              <IconButton disabled>
+                <KeyboardArrowUpIcon disabled />
+              </IconButton>
+            </Button>
           }
           <Button
             color="primary"

@@ -36,6 +36,8 @@ import CloseIcon from '@material-ui/icons/Close';
 import AddBoxIcon from '@material-ui/icons/AddBox';
 import DeleteIcon from '@material-ui/icons/Delete';
 import EditIcon from '@material-ui/icons/Edit';
+import KeyboardArrowDownIcon from '@material-ui/icons/KeyboardArrowDown';
+import KeyboardArrowUpIcon from '@material-ui/icons/KeyboardArrowUp';
 
 import lightBlue from "@material-ui/core/colors/lightBlue";
 import blue from '@material-ui/core/colors/blue';
@@ -83,8 +85,12 @@ const editMatchCardStyles = theme =>({
   controlLeftIcon: {
     marginRight: theme.spacing.unit,
   },
+  loadmoreButtonGrid: {
+    width: '100%'
+  },
   loadmoreButton: {
-    height: 56
+    height: 56,
+    margin: 'auto'
   },
 })
 
@@ -103,6 +109,7 @@ const EditMatchCard = withStyles(editMatchCardStyles)(
       selectedMatchClass: null,
       searchData: '',
       editState: false,
+      matchDisplayState: false,
       editClassState: false,
       deleteState: false,
       matchEditorData: {
@@ -111,14 +118,22 @@ const EditMatchCard = withStyles(editMatchCardStyles)(
         matchname: null
       },
       matchListVisible: 5,
-      userListVisible: 10,
       arrEditClass: []
     }
     toggleEdit = () =>{
       this.setState( prev =>{
         return {
           editState: !prev.editState ,
-          editClassState: false,
+          matchDisplayState: false,
+          deleteState: false
+        }
+      })
+    }
+    toggleMatchDisplay = () =>{
+      this.setState( prev =>{
+        return {
+          editState: false,
+          matchDisplayState: !prev.matchDisplayState,
           deleteState: false
         }
       })
@@ -126,9 +141,7 @@ const EditMatchCard = withStyles(editMatchCardStyles)(
     toggleEditClass = () =>{
       this.setState( prev =>{
         return {
-          editState:  false,
           editClassState: !prev.editClassState,
-          deleteState: false
         }
       })
     }
@@ -136,7 +149,7 @@ const EditMatchCard = withStyles(editMatchCardStyles)(
       this.setState( prev =>{
         return {
           editState: false,
-          editClassState: false,
+          matchDisplayState: false,
           deleteState: !prev.deleteState
         }
       })
@@ -147,10 +160,8 @@ const EditMatchCard = withStyles(editMatchCardStyles)(
         return { matchListVisible: prev.matchListVisible + 5 }
       })
     }
-    handleUserListLoadmore = () =>{
-      this.setState( prev =>{
-        return { userListVisible: prev.userListVisible + 10 }
-      })
+    handleMatchListLoadless = () =>{
+      this.setState({ matchListVisible: 5 })
     }
     handleEditMatch = (d) =>{
       console.log(d);
@@ -209,6 +220,9 @@ const EditMatchCard = withStyles(editMatchCardStyles)(
     handleClassEditClass = () =>{
       this.fetchClassEdit()
     }
+    handleMatchDisplay = (d) =>{
+      this.fetchMatchDisplay(d)
+    }
 
     afterEditor = (data) =>{
       this.setState({ matchData: data })
@@ -255,7 +269,8 @@ const EditMatchCard = withStyles(editMatchCardStyles)(
           userid: user.userid[i],
           fullname: user.fullname[i],
           lastname: user.lastname[i],
-          classno: user.classno[i]
+          classno: user.classno[i],
+          display: user.display[i]
         })
       }
       for(var i = 0;i < user.classname.length;i++){
@@ -281,6 +296,13 @@ const EditMatchCard = withStyles(editMatchCardStyles)(
       })
       console.log(data);
     }
+    async fetchMatchDisplay(d){
+      const data = await fetchPostUrl('https://thai-pga.com/api/matchcheckdisplay',{
+        userid: parseInt(this.props.adminData.id),
+        matchid: d.matchid,
+      })
+      this.handleLoadMatch()
+    }
     async handleLoadMatch(){
       const match = await fetchUrl('https://thai-pga.com/api/loadmatch')
       /*https://thai-pga.com/api/matchedit
@@ -300,7 +322,8 @@ const EditMatchCard = withStyles(editMatchCardStyles)(
           matchid: match.matchid[i],
           matchname: match.matchname[i],
           date: match.date[i],
-          fieldname: match.fieldname[i]
+          fieldname: match.fieldname[i],
+          display: match.display[i]
         })
       }
       this.setState({ matchData: tempData })
@@ -317,12 +340,12 @@ const EditMatchCard = withStyles(editMatchCardStyles)(
       const { classes, adminData } = this.props
       const { matchEditorModalState, userListModalState, userListInMatchModalState } = this.state
       const {
-        matchListVisible, userListVisible,
+        matchListVisible,
         expanded, matchData,
         userMatchData, userMatchClassname, userListData,
         searchData, selectedMatch, matchEditorData
       } = this.state
-      const { editState, editUserState, editClassState ,deleteState, deleteUserState } = this.state
+      const { editState, editUserState, matchDisplayState, editClassState ,deleteState, deleteUserState } = this.state
       return (
         <Paper className={classes.root} elevation={2}>
           { matchEditorModalState &&
@@ -373,6 +396,14 @@ const EditMatchCard = withStyles(editMatchCardStyles)(
                   <EditIcon className={classes.controlLeftIcon} />
                   Edit
                 </Button>
+                <Button
+                  variant={ matchDisplayState? "contained":"outlined" }
+                  color={ matchDisplayState? "primary":"inherit" }
+                  className={classes.controlButton}
+                  onClick={this.toggleMatchDisplay}>
+                  <EditIcon className={classes.controlLeftIcon} />
+                  Display
+                </Button>
                 <div style={{ flex: 1 }}></div>
                 <Button
                   variant={ deleteState? "contained":"outlined" }
@@ -409,34 +440,54 @@ const EditMatchCard = withStyles(editMatchCardStyles)(
                           (item.matchname.toLowerCase().search(searchData.toLowerCase()) !== -1)
                         )
                       }).slice( 0 , matchListVisible ).map( d=>
-                      <ListItem button onClick={()=>this.handleSelect(d)}>
+                      <ListItem button
+                        onClick={()=>matchDisplayState ?
+                          this.handleMatchDisplay(d)
+                          :this.handleSelect(d)
+                        }>
                         <ListItemText primary={d.matchname} />
                         <ListItemSecondaryAction>
-                          { editState ?
+                          { editState &&
                             <IconButton
                               onClick={()=>this.handleEditMatch(d)}>
                               <EditIcon fontSize="small"/>
                             </IconButton>
-                            :null
                           }
-                          { deleteState ?
+                          { matchDisplayState &&
+                            <Checkbox
+                              onChange={()=>this.handleMatchDisplay(d)}
+                              checked={ (d.display === 1)? true:false }
+                              />
+                          }
+                          { deleteState &&
                             <IconButton
                               onClick={()=>this.handleDeleteMatch(d)}>
                               <DeleteIcon fontSize="small"/>
                             </IconButton>
-                            :null
                           }
                         </ListItemSecondaryAction>
                       </ListItem>
                     ):<p>Loading ...</p>
                   }
                 </List>
-                { matchData ?
-                  matchListVisible < matchData.length &&
+                { matchData &&
+                  matchListVisible < matchData.length ?
                   <Button
                     fullWidth
-                    onClick={this.handleMatchListLoadmore}
-                    className={classes.loadmoreButton}>Loadmore</Button>:null
+                    className={classes.loadmoreButton}
+                    onClick={this.handleMatchListLoadmore}>
+                    <IconButton disabled>
+                      <KeyboardArrowDownIcon disabled />
+                    </IconButton>
+                  </Button>:
+                  <Button
+                    fullWidth
+                    className={classes.loadmoreButton}
+                    onClick={this.handleMatchListLoadless}>
+                    <IconButton disabled>
+                      <KeyboardArrowUpIcon disabled />
+                    </IconButton>
+                  </Button>
                 }
               </div>
             </ExpansionPanelDetails>

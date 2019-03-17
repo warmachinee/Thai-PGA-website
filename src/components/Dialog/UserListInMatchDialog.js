@@ -19,12 +19,17 @@ import ListItem from '@material-ui/core/ListItem';
 import ListItemText from '@material-ui/core/ListItemText';
 import ListItemSecondaryAction from '@material-ui/core/ListItemSecondaryAction';
 import Checkbox from '@material-ui/core/Checkbox';
+import Menu from '@material-ui/core/Menu';
+import MenuItem from '@material-ui/core/MenuItem';
+import Grow from '@material-ui/core/Grow';
 
 import SearchIcon from '@material-ui/icons/Search';
 import CloseIcon from '@material-ui/icons/Close';
 import AddBoxIcon from '@material-ui/icons/AddBox';
 import DeleteIcon from '@material-ui/icons/Delete';
 import EditIcon from '@material-ui/icons/Edit';
+import KeyboardArrowDownIcon from '@material-ui/icons/KeyboardArrowDown';
+import KeyboardArrowUpIcon from '@material-ui/icons/KeyboardArrowUp';
 
 import blue from '@material-ui/core/colors/blue';
 
@@ -98,6 +103,7 @@ const styles = theme => ({
 class UserListInMatchDialog extends React.Component {
   state = {
     searchUser: '',
+    anchorEl: null,
     snackBarState: false,
     snackBarMessage: null,
     snackBarVariant: null,
@@ -108,7 +114,9 @@ class UserListInMatchDialog extends React.Component {
     arrEdit: {
       fullname: [],
       lastname: []
-    }
+    },
+    classChecked: [],
+    classSelected: null
   }
   toggleEditName = () =>{
     this.setState( prev =>{
@@ -137,6 +145,24 @@ class UserListInMatchDialog extends React.Component {
       }
     })
   }
+  handleMenu = event => {
+    this.setState({ anchorEl: event.currentTarget });
+  };
+  handleMenuClose = () => {
+    this.setState({ anchorEl: null });
+  };
+  handleSelectMenu = (i) =>{
+    this.setState({ classSelected: parseInt(i) })
+    this.handleMenuClose()
+  }
+  handleEditClass = () =>{
+    const { classChecked, classSelected } = this.state
+    let classno = []
+    for(var i = 0;i < classChecked.length;i++){
+      classno.push(classSelected)
+    }
+    this.fetchUserClassEdit(classChecked, classno)
+  }
   handleFullnameChange = ( value, d, i ) =>{
     const { arrEdit } = this.state
     if( value === ""){
@@ -158,13 +184,12 @@ class UserListInMatchDialog extends React.Component {
       return { userListVisible: prev.userListVisible + 10 }
     })
   }
-  showData = (d) =>{
-    console.log(
-      "d : ", d,
-      "fullname : ", this.state.arrEdit.fullname[d.index],
-      "lastname : ", this.state.arrEdit.lastname[d.index],
-      "target : ", this.props.userMatchData[d.index].userid
-    );
+  handleUserListLoadless = () =>{
+    this.setState({ userListVisible: 10 })
+  }
+
+  handleRemoveUser = (d) =>{
+    this.fetchRemoveUser(d)
   }
   handleUserEdit = (d) =>{
     this.fetchUserEdit(d)
@@ -173,23 +198,62 @@ class UserListInMatchDialog extends React.Component {
     this.handleLoadUserMatch()
     this.props.close()
   }
+  handleEditClassChecked = (d) =>{
+    const { classChecked } = this.state;
+    const currentIndex = classChecked.indexOf(d.userid);
+    const newChecked = [...classChecked];
+    if (currentIndex === -1) {
+      newChecked.push(d.userid);
+    } else {
+      newChecked.splice(currentIndex, 1);
+    }
+    this.setState({
+      classChecked: newChecked,
+    });
+  }
+  async fetchRemoveUser(d){
+    const data = await fetchPostUrl('https://www.thai-pga.com/api/matchremoveuser',{
+      userid: parseInt(this.props.adminData.id),
+      matchid: this.props.selectedMatch.matchid,
+      target: d.userid
+    })
+    console.log(data);
+    this.handleLoadUserMatch()
+  }
+  async fetchUserClassEdit(arrUserid, arrClassno){
+    const data = await fetchPostUrl('https://www.thai-pga.com/api/matchedituserclass',{
+      userid: parseInt(this.props.adminData.id),
+      matchid: this.props.selectedMatch.matchid,
+      target: arrUserid,
+      classno: arrClassno
+    })
+    console.log(data);
+    this.handleLoadUserMatch()
+  }
   async fetchUserEdit(d){
-    console.log(
-      "userid : " ,parseInt(this.props.adminData.id),
-      "fullname : " ,this.state.arrEdit.fullname[d.index],
-      "lastname : " ,this.state.arrEdit.lastname[d.index],
-      "target : " ,this.props.userMatchData[d.index].userid
-    );
+    /*
+    https://www.thai-pga.com/api/matchcheckuserdisplay
+    userid => 123456 adminID
+    matchid
+    target
+    */
+    console.log(d);
     const data = await fetchPostUrl('https://www.thai-pga.com/api/useredit',{
       userid: parseInt(this.props.adminData.id),
       fullname: this.state.arrEdit.fullname[d.index],
       lastname: this.state.arrEdit.lastname[d.index],
-      target: this.props.userMatchData[d.index].userid
+      target: d.userid
     })
     console.log(data);
     this.handleLoadUserMatch()
   }
   async handleLoadUserMatch(){
+    /*
+    https://www.thai-pga.com/api/matchremoveuser
+    userid => 123456 adminID
+    matchid
+    target
+    */
     const user = await fetchPostUrl('https://thai-pga.com/api/loadusermatch',{
       matchid: this.props.selectedMatch.matchid
     })
@@ -201,7 +265,8 @@ class UserListInMatchDialog extends React.Component {
         userid: user.userid[i],
         fullname: user.fullname[i],
         lastname: user.lastname[i],
-        classno: user.classno[i]
+        classno: user.classno[i],
+        display: user.display[i]
       })
     }
     for(var i = 0;i < user.classname.length;i++){
@@ -225,8 +290,8 @@ class UserListInMatchDialog extends React.Component {
   }
   render() {
     const { classes, close, modalState, userMatchData, userMatchClassname, adminData } = this.props;
-    const { userListVisible, searchUser, snackBarState, snackBarMessage, snackBarVariant } = this.state
-    const { editNameState, editClassState, deleteState } = this.state
+    const { userListVisible, searchUser, snackBarState, snackBarMessage, snackBarVariant, classSelected } = this.state
+    const { editNameState, editClassState, deleteState, anchorEl } = this.state
     return (
       <Modal
         open={modalState}
@@ -259,16 +324,36 @@ class UserListInMatchDialog extends React.Component {
               <EditIcon className={classes.controlLeftIcon} />
               Class
             </Button>
-            <Button
-              className={classes.controlButton}
-              onClick={()=>console.log(userMatchData)}>
-              Data
-            </Button>
-            <Button
-              className={classes.controlButton}
-              onClick={()=>console.log(this.state.arrEdit)}>
-              ShowData
-            </Button>
+            <Grow in={editClassState} style={{ transitionDelay: editClassState ? '0ms' : '100ms' }}>
+              <Button
+                variant="outlined"
+                color="primary"
+                style={{ textTransform: 'none' }}
+                className={classes.controlButton}
+                onClick={this.handleMenu}>
+                { classSelected !== null ?
+                  userMatchClassname[classSelected]
+                  :'Select Class'
+                }
+              </Button>
+            </Grow>
+            <Menu
+              anchorEl={anchorEl}
+              open={Boolean(anchorEl)}
+              onClose={this.handleMenuClose}>
+              {userMatchClassname.map((d,i) =>
+                <MenuItem onClick={()=>this.handleSelectMenu(i)}>{d}</MenuItem>
+              )}
+            </Menu>
+            <Grow in={editClassState} style={{ transitionDelay: editClassState ? '100ms' : '0ms' }}>
+              <Button
+                variant="outlined"
+                color="primary"
+                className={classes.controlButton}
+                onClick={this.handleEditClass}>
+                Save
+              </Button>
+            </Grow>
             <div style={{ flex: 1 }}></div>
             <Button
               variant={ deleteState? "contained":"outlined" }
@@ -309,11 +394,16 @@ class UserListInMatchDialog extends React.Component {
                   <ListItem
                     button={ !editNameState }
                     style={{ height: 56 }}
-                    onClick={()=> !editNameState ? console.log(d):null}>
+                    onClick={()=>!editNameState ? this.handleEditClassChecked(d):null}>
                     { editClassState ?
-                      <Checkbox
-                        disableRipple
-                      />:<div style={{ width: 48 }}></div>
+                      <Grow in={editClassState} style={{ transitionDelay: editClassState ? `${30 * i}ms` : '0ms' }}>
+                        <Checkbox
+                          checked={this.state.classChecked.indexOf(d.userid) !== -1}
+                          disableRipple
+                          color="primary"
+                        />
+                      </Grow>
+                      :<div style={{ width: 48 }}></div>
                     }
                     <ListItemText
                       className={classes.userMatchItemName}
@@ -345,7 +435,7 @@ class UserListInMatchDialog extends React.Component {
                       primary={userMatchClassname[d.classno]} />
                     <ListItemSecondaryAction>
                       { deleteState ?
-                        <IconButton>
+                        <IconButton onClick={()=>this.handleRemoveUser(d)}>
                           <DeleteIcon fontSize="small"/>
                         </IconButton>
                         :null
@@ -363,11 +453,15 @@ class UserListInMatchDialog extends React.Component {
                   <ListItem
                     button={ !editNameState }
                     style={{ height: 56 }}
-                    onClick={()=>!editNameState ? console.log(d):null}>
+                    onClick={()=>!editNameState ? this.handleEditClassChecked(d):null}>
                     { editClassState ?
-                      <Checkbox
-                        disableRipple
-                      />
+                      <Grow in={editClassState} style={{ transitionDelay: editClassState ? `${30 * i}ms` : '0ms' }}>
+                        <Checkbox
+                          checked={this.state.classChecked.indexOf(d) !== -1}
+                          disableRipple
+                          color="primary"
+                        />
+                      </Grow>
                       :<div style={{ width: 48 }}></div>
                     }
                     <ListItemText
@@ -413,21 +507,29 @@ class UserListInMatchDialog extends React.Component {
                       }
                     </ListItemSecondaryAction>
                   </ListItem>
+
                 )
               }
             </List>
 
-            { userMatchData ?
-              userListVisible < userMatchData.length &&
+            { userMatchData &&
+              userListVisible < userMatchData.length ?
               <Button
                 fullWidth
-                onClick={this.handleUserListLoadmore}
-                className={classes.loadmoreButton}>Loadmore</Button>:
-              userListVisible < 20 &&
+                className={classes.loadmoreButton}
+                onClick={this.handleUserListLoadmore}>
+                <IconButton disabled>
+                  <KeyboardArrowDownIcon disabled />
+                </IconButton>
+              </Button>:
               <Button
                 fullWidth
-                onClick={this.handleUserListLoadmore}
-                className={classes.loadmoreButton}>Loadmore</Button>
+                className={classes.loadmoreButton}
+                onClick={this.handleUserListLoadless}>
+                <IconButton disabled>
+                  <KeyboardArrowUpIcon disabled />
+                </IconButton>
+              </Button>
             }
           </div>
           <SnackBarAlert
