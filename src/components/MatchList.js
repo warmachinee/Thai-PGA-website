@@ -87,7 +87,7 @@ function MatchList(props) {
             data={{
               matchname: 'Matchname',
               datamatch: '01/01/2019',
-              img: 'http://2.bp.blogspot.com/-V31y2Ef4Ad0/VZservQf70I/AAAAAAAAdu8/ErI--hbXwfE/s1600/OpenCamera1.png',
+              img: null,
               fieldname: 'Fieldname'
             }}/>
         }

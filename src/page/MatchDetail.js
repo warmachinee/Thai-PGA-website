@@ -67,6 +67,7 @@ const styles = theme => ({
 });
 function MatchDetail(props){
   const { classes, matchParams, urlParams, data } = props;
+
   const [ dataGrouped, setDataGrouped ] = useState(null)
   const mediaStyle = {
     backgroundSize: 'cover',
@@ -83,6 +84,7 @@ function MatchDetail(props){
 
   function ScoreBoardExpansion(props){
     const { data, rawData } = props
+
     const [ rf, refresh ] = useState(0)
 
     const rowLabelStyle = {
@@ -236,7 +238,7 @@ function MatchDetail(props){
                   </div>
                 </TableCell>
               )}
-              <TableCell style={{ fontWeight: 'bold' }} className={classes.cellStyle} align="center" padding="none">{data? data[index].in:'OUT'}</TableCell>
+              <TableCell style={{ fontWeight: 'bold' }} className={classes.cellStyle} align="center" padding="none">{data? data[index].out:'OUT'}</TableCell>
             </TableRow>
             <TableRow>
               {[1,2,3,4,5,6,7,8,9].map((d,i)=>
@@ -260,7 +262,7 @@ function MatchDetail(props){
                   </div>
                 </TableCell>
               )}
-              <TableCell style={{ fontWeight: 'bold' }} className={classes.cellStyle} align="center" padding="none">{data? data[index].out:'IN'}</TableCell>
+              <TableCell style={{ fontWeight: 'bold' }} className={classes.cellStyle} align="center" padding="none">{data? data[index].in:'IN'}</TableCell>
             </TableRow>
             <div style={{ flex: 1}}></div>
           </TableBody>
@@ -305,7 +307,7 @@ function MatchDetail(props){
                   </div>
                 </TableCell>
               )}
-              <TableCell style={{ fontWeight: 'bold' }} align="center" padding="none">{data? data[index].in:'OUT'}</TableCell>
+              <TableCell style={{ fontWeight: 'bold' }} align="center" padding="none">{data? data[index].out:'OUT'}</TableCell>
             </TableRow>
           </TableBody>
           {/*---------- HOLE 10 - 18 ----------*/}
@@ -344,7 +346,7 @@ function MatchDetail(props){
                   </div>
                 </TableCell>
               )}
-              <TableCell style={{ fontWeight: 'bold' }} align="center" padding="none">{data? data[index].out:'IN'}</TableCell>
+              <TableCell style={{ fontWeight: 'bold' }} align="center" padding="none">{data? data[index].in:'IN'}</TableCell>
             </TableRow>
           </TableBody>
         </Table>
@@ -380,8 +382,8 @@ function MatchDetail(props){
               {data? data[index].full:'Player'}{"  "}{data? data[index].last:'Player'}
             </div>
             <div style={{flex: 1}}></div>
-            <div style={rowStyle}>{data? data[index].in:'OUT'}</div>
-            <div style={rowStyle}>{data? data[index].out:'IN'}</div>
+            <div style={rowStyle}>{data? data[index].out:'OUT'}</div>
+            <div style={rowStyle}>{data? data[index].in:'IN'}</div>
             <div style={rowStyle}>{data? data[index].gross:'TOT'}</div>
           </ExpansionPanelSummary>
           <ExpansionPanelDetails style={{padding: '0 8px',display: 'flex'}}>
@@ -443,8 +445,8 @@ function MatchDetail(props){
       <ExpansionPanel>
         <ExpansionPanelSummary expandIcon={<ExpandMoreIcon />}>
           <Typography>
-            {data? data[0].departname: 'none'}{" "}
-            ( {data?data.length:0} {data? (data.length > 1?'Players':'Player'):'Player'})
+            {data.length? data[0].classname: 'none'}{" "}
+            ( {data.length?data.length:0} {data? (data.length > 1?'Players':'Player'):'Player'})
           </Typography>
         </ExpansionPanelSummary>
         <ExpansionPanelDetails style={{padding: 8,flexDirection: 'column'}}>
@@ -480,7 +482,7 @@ function MatchDetail(props){
               <div style={rowLabelStyle}>{'TOT'}</div>
             </ExpansionPanelSummary>
           </ExpansionPanel>
-          {data? data.map( (d,i) =>
+          {data.length? data.map( (d,i) =>
             <ScoreTable key={i} data={data} index={i} rawData={rawData} />
           ):<ScoreTable />}
         </ExpansionPanelDetails>
@@ -491,25 +493,27 @@ function MatchDetail(props){
   useEffect(()=>{
     let tempData = []
     if(data){
-      for(var i = 0;i < data[matchParams].departnum;i++){
+      for(var i = 0;i < data[matchParams].classnum;i++){
         let obj = []
-        for(var j = 0;j < data[matchParams].userid.length;j++){
-          obj.push({
-            departno: data[matchParams].departno[j],
-            departname: data[matchParams].departname ? data[matchParams].departname[j]: 'none',
-            full: data[matchParams].full[j],
-            last: data[matchParams].last[j],
-            in: data[matchParams].in ? data[matchParams].in[j]: 0,
-            out: data[matchParams].out ? data[matchParams].out[j]: 0,
-            gross: data[matchParams].gross ? data[matchParams].gross[j]: 0,
-            rank: data[matchParams].rank ? data[matchParams].rank[j]: 0,
-            holescore:
-            data[matchParams].holescore ?
-            data[matchParams].holescore[j]: [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-          })
+        if(data[matchParams].userid){
+          for(var j = 0;j < data[matchParams].userid.length;j++){
+            obj.push({
+              classno: data[matchParams].classno[j],
+              classname: data[matchParams].classname ? data[matchParams].classname[j]: 'none',
+              full: data[matchParams].full[j],
+              last: data[matchParams].last[j],
+              in: data[matchParams].in ? data[matchParams].in[j]: 0,
+              out: data[matchParams].out ? data[matchParams].out[j]: 0,
+              gross: data[matchParams].gross ? data[matchParams].gross[j]: 0,
+              rank: data[matchParams].rank ? data[matchParams].rank[j]: 0,
+              holescore:
+              data[matchParams].holescore ?
+              data[matchParams].holescore[j]: [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+            })
+          }
         }
         const filtered = obj.filter((d)=>{
-          return d.departno === i+1
+          return d.classno === i + 1
         })
         tempData.push(filtered)
       }
@@ -538,7 +542,7 @@ function MatchDetail(props){
           { dataGrouped ?
             dataGrouped.map( d =>
               <ScoreBoardExpansion data={d} rawData={data}/>
-            ):/*<Typography variant="h5">Loading ...</Typography>*/<ScoreBoardExpansion />
+            ):<Typography variant="h5">Loading ...</Typography>
           }
         </div>
       </Paper>

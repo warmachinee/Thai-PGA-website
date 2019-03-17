@@ -31,7 +31,7 @@ class App extends Component {
     }
   }
   async doFetchData(){
-    const data = await fetchUrl('https://thai-pga.com/php/SNTshow.php')
+    const data = await fetchUrl('https://www.thai-pga.com/api/loadmainmatch')
     this.setState({dataFromFetch: data})
   }
 

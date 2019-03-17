@@ -139,6 +139,14 @@ class MenuAppBar extends React.Component {
                 open={open}
                 onClose={this.handleMenu}
               >
+                { isAdminAuthenticated && (window.location.pathname === '/') ?
+                  <Link to='/user' style={{ textDecoration: 'none',color: 'white' }}>
+                    <MenuItem onClick={this.handleMenuClose}>Admin</MenuItem>
+                  </Link>:
+                  <Link to='/' style={{ textDecoration: 'none',color: 'white' }}>
+                    <MenuItem onClick={this.handleMenuClose}>Home</MenuItem>
+                  </Link>
+                }
                 <MenuItem onClick={this.handleAdminLogout}>Log out</MenuItem>
               </Menu>
             </div>

@@ -23,7 +23,7 @@ const styles = {
 
 function SlideShowBody(props){
   const { classes, autoPlay, duration, data } = props;
-  const slideImageLength = data? data.length : 5
+  const slideImageLength = data? data.length : 0
   const [ itemIndex, setItemIndex ] = useState(0)
   const [ intervalId, setIntervalId ] = useState(null)
   const [ rf, refresh ] = useState(0)
@@ -162,23 +162,16 @@ function SlideShowBody(props){
               </div>
             </Link>
             ):
-            [ 'https://thai-pga.com/images/pinehurst.jpg',
-              'https://thai-pga.com/images/uniland.jpg',
-              'https://thai-pga.com/images/watermill.jpg',
-              'https://thai-pga.com/images/pinehurst.jpg',
-              'https://thai-pga.com/images/muangake.jpg'].map( (d,i)=>
-              <div key={i} style={style.item, { overflow: 'hidden' }}>
-                <div
-                  style={{
-                    backgroundImage: `url(${d})`,
-                    height: SliderSize().height,
-                    backgroundSize: 'cover',
-                    backgroundRepeat: 'no-repeat',
-                    backgroundPosition: 'center'
-                  }}></div>
-                <div style={style.imgTitle}>Loading .... {i}</div>
-              </div>
-            )
+            <div style={style.item, { overflow: 'hidden' }}>
+              <div
+                style={{
+                  height: SliderSize().height,
+                  backgroundSize: 'cover',
+                  backgroundRepeat: 'no-repeat',
+                  backgroundPosition: 'center'
+                }}></div>
+              <div style={style.imgTitle}>Loading .... </div>
+            </div>
           }
         </SwipeableViews>
       </div>
