@@ -173,7 +173,7 @@ class FieldDialog extends React.Component {
   }
 
   async fetchLoadField(){
-    const field = await fetchUrl('https://thai-pga.com/api/loadfield')
+    const field = await fetchUrl('https://tofftime.com/api/loadfield')
     let tempData = []
     for(var i = 0;i < field.fieldid.length;i++){
       tempData.push({
@@ -247,7 +247,7 @@ class FieldDialog extends React.Component {
             <div style={{ flex: 1 }}></div>
             <Button
               variant={ deleteState? "contained":"outlined" }
-              color={ deleteState? "primary":"inherit" }
+              color={ deleteState? "secondary":"inherit" }
               className={classes.controlButton}
               onClick={this.toggleDelete}>
               <DeleteIcon className={classes.controlLeftIcon} />
@@ -264,7 +264,7 @@ class FieldDialog extends React.Component {
               InputProps={{
                 endAdornment: (
                   <InputAdornment position="end">
-                    <IconButton>
+                    <IconButton disabled>
                       <SearchIcon />
                     </IconButton>
                   </InputAdornment>
@@ -303,7 +303,7 @@ class FieldDialog extends React.Component {
             </List>
           </div>
           { fieldData &&
-            visible < fieldData.length ?
+            (visible < fieldData.length ?
             <Button
               fullWidth
               className={classes.loadmoreButton}
@@ -312,6 +312,7 @@ class FieldDialog extends React.Component {
                 <KeyboardArrowDownIcon disabled />
               </IconButton>
             </Button>:
+            (fieldData.length > 10 &&
             <Button
               fullWidth
               className={classes.loadmoreButton}
@@ -319,7 +320,7 @@ class FieldDialog extends React.Component {
               <IconButton disabled>
                 <KeyboardArrowUpIcon disabled />
               </IconButton>
-            </Button>
+            </Button>))
           }
           <Button
             color="primary"

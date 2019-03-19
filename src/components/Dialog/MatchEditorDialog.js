@@ -86,7 +86,7 @@ class MatchEditorDialog extends React.Component {
     this.fetchDeleteMatch()
   }
   async fetchDeleteMatch(){
-    const data = await fetchPostUrl('https://thai-pga.com/api/matchdelete',{
+    const data = await fetchPostUrl('https://tofftime.com/api/matchdelete',{
       userid: parseInt(this.props.adminData.id),
       matchid: this.props.matchEditorData.matchid,
     })
@@ -102,7 +102,7 @@ class MatchEditorDialog extends React.Component {
     }
   }
   async fetchLoadMatch(){
-    const match = await fetchUrl('https://thai-pga.com/api/loadmatch')
+    const match = await fetchUrl('https://tofftime.com/api/loadmatch')
     let tempData = []
     for(var i = 0;i < match.matchid.length;i++){
       tempData.push({

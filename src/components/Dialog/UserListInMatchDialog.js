@@ -22,12 +22,16 @@ import Checkbox from '@material-ui/core/Checkbox';
 import Menu from '@material-ui/core/Menu';
 import MenuItem from '@material-ui/core/MenuItem';
 import Grow from '@material-ui/core/Grow';
+import Tooltip from '@material-ui/core/Tooltip';
 
 import SearchIcon from '@material-ui/icons/Search';
 import CloseIcon from '@material-ui/icons/Close';
 import AddBoxIcon from '@material-ui/icons/AddBox';
 import DeleteIcon from '@material-ui/icons/Delete';
 import EditIcon from '@material-ui/icons/Edit';
+import PersonIcon from '@material-ui/icons/Person';
+import ClassIcon from '@material-ui/icons/Class';
+import PersonalVideoIcon from '@material-ui/icons/PersonalVideo';
 import KeyboardArrowDownIcon from '@material-ui/icons/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@material-ui/icons/KeyboardArrowUp';
 
@@ -57,9 +61,12 @@ const styles = theme => ({
     paddingTop: theme.spacing.unit * 4,
     paddingBottom: theme.spacing.unit * 4,
     outline: 'none',
-    maxWidth: 700,
+    maxWidth: 800,
     width: '100%',
     minWidth: 300,
+    overflow: 'auto',
+    overflowScrolling: 'touch',
+    WebkitOverflowScrolling: 'touch'
   },
   dialogTitle: {
     margin: 0,
@@ -78,10 +85,7 @@ const styles = theme => ({
     color: theme.palette.grey[500],
   },
   controlButton: {
-    marginLeft: theme.spacing.unit * 2,
-    marginRight: 0,
-    paddingTop: theme.spacing.unit,
-    paddingBottom: theme.spacing.unit,
+    margin: theme.spacing.unit * 2,
   },
   controlLeftIcon: {
     marginRight: theme.spacing.unit,
@@ -92,12 +96,6 @@ const styles = theme => ({
   loadmoreButton: {
     height: 56
   },
-  userMatchItemName: {
-    width: '40%'
-  },
-  userMatchItemClass: {
-
-  }
 });
 
 class UserListInMatchDialog extends React.Component {
@@ -110,6 +108,7 @@ class UserListInMatchDialog extends React.Component {
     userListVisible: 10,
     editNameState: false,
     editClassState: false,
+    playerDisplayState: false,
     deleteState: false,
     arrEdit: {
       fullname: [],
@@ -123,6 +122,7 @@ class UserListInMatchDialog extends React.Component {
       return {
         editNameState: !prev.editNameState ,
         editClassState: false ,
+        playerDisplayState: false,
         deleteState: false
       }
     })
@@ -132,6 +132,17 @@ class UserListInMatchDialog extends React.Component {
       return {
         editNameState: false ,
         editClassState: !prev.editClassState ,
+        playerDisplayState: false,
+        deleteState: false
+      }
+    })
+  }
+  togglePlayerDisplay = () =>{
+    this.setState( prev =>{
+      return {
+        editNameState: false ,
+        editClassState: false ,
+        playerDisplayState: !prev.playerDisplayState,
         deleteState: false
       }
     })
@@ -198,6 +209,9 @@ class UserListInMatchDialog extends React.Component {
     this.handleLoadUserMatch()
     this.props.close()
   }
+  handlePlayerDisplay = (d) =>{
+    this.fetchPlayerDisplay(d)
+  }
   handleEditClassChecked = (d) =>{
     const { classChecked } = this.state;
     const currentIndex = classChecked.indexOf(d.userid);
@@ -212,16 +226,23 @@ class UserListInMatchDialog extends React.Component {
     });
   }
   async fetchRemoveUser(d){
-    const data = await fetchPostUrl('https://www.thai-pga.com/api/matchremoveuser',{
+    const data = await fetchPostUrl('https://www.tofftime.com/api/matchremoveuser',{
       userid: parseInt(this.props.adminData.id),
       matchid: this.props.selectedMatch.matchid,
       target: d.userid
     })
-    console.log(data);
-    this.handleLoadUserMatch()
+    if(data.status === 'success'){
+      this.handleLoadUserMatch()
+    }else{
+      this.setState({
+        snackBarState: true,
+        snackBarMessage: data.status,
+        snackBarVariant: 'error'
+      })
+    }
   }
   async fetchUserClassEdit(arrUserid, arrClassno){
-    const data = await fetchPostUrl('https://www.thai-pga.com/api/matchedituserclass',{
+    const data = await fetchPostUrl('https://www.tofftime.com/api/matchedituserclass',{
       userid: parseInt(this.props.adminData.id),
       matchid: this.props.selectedMatch.matchid,
       target: arrUserid,
@@ -230,35 +251,45 @@ class UserListInMatchDialog extends React.Component {
     console.log(data);
     this.handleLoadUserMatch()
   }
+  async fetchPlayerDisplay(d){
+    const data = await fetchPostUrl('https://www.tofftime.com/api/matchcheckuserdisplay',{
+      userid: parseInt(this.props.adminData.id),
+      matchid: this.props.selectedMatch.matchid,
+      target: d.userid,
+    })
+    console.log(data);
+    this.handleLoadUserMatch()
+  }
   async fetchUserEdit(d){
-    /*
-    https://www.thai-pga.com/api/matchcheckuserdisplay
-    userid => 123456 adminID
-    matchid
-    target
-    */
-    console.log(d);
-    const data = await fetchPostUrl('https://www.thai-pga.com/api/useredit',{
+    const data = await fetchPostUrl('https://www.tofftime.com/api/useredit',{
       userid: parseInt(this.props.adminData.id),
       fullname: this.state.arrEdit.fullname[d.index],
       lastname: this.state.arrEdit.lastname[d.index],
       target: d.userid
     })
-    console.log(data);
-    this.handleLoadUserMatch()
+    if(data.status === 'success'){
+      this.handleLoadUserMatch()
+      this.setState({
+        snackBarState: true,
+        snackBarMessage: data.status,
+        snackBarVariant: 'success'
+      })
+    }else{
+      this.setState({
+        snackBarState: true,
+        snackBarMessage: data.status,
+        snackBarVariant: 'error'
+      })
+    }
   }
   async handleLoadUserMatch(){
-    /*
-    https://www.thai-pga.com/api/matchremoveuser
-    userid => 123456 adminID
-    matchid
-    target
-    */
-    const user = await fetchPostUrl('https://thai-pga.com/api/loadusermatch',{
+    const user = await fetchPostUrl('https://tofftime.com/api/loadusermatch',{
       matchid: this.props.selectedMatch.matchid
     })
     let tempData = []
     let tempClass = []
+    let tempPlayoffData = []
+    let tempUserMatchClassname = []
     for(var i = 0;i < user.userid.length;i++){
       tempData.push({
         index: i,
@@ -266,13 +297,31 @@ class UserListInMatchDialog extends React.Component {
         fullname: user.fullname[i],
         lastname: user.lastname[i],
         classno: user.classno[i],
-        display: user.display[i]
+        display: user.display[i],
+        score: user.score[i],
+        in: user.in[i],
+        out: user.out[i],
+        gross: user.gross[i],
+        par: user.par[i]
       })
     }
     for(var i = 0;i < user.classname.length;i++){
       tempClass.push(user.classname[i])
     }
-    this.props.afterEditPlayerInMatch( tempData, user.classname, tempClass )
+    for(var i = 0;i < user.fullplayoff.length;i++){
+      tempPlayoffData.push({
+        fullname: user.fullplayoff[i],
+        lastname: user.lastplayoff[i]
+      })
+    }
+    for(var i = 0;i < user.classname.length + 1;i++){
+      if(i === 0){
+        tempUserMatchClassname.push('-')
+      }else{
+        tempUserMatchClassname.push(user.classname[i-1])
+      }
+    }
+    this.props.afterEditPlayerInMatch( tempData, tempUserMatchClassname, tempClass, user.playoff, tempPlayoffData )
   }
   handleRefresh = () =>{
     this.setState(this.state)
@@ -289,9 +338,9 @@ class UserListInMatchDialog extends React.Component {
     window.removeEventListener('resize',this.handleRefresh)
   }
   render() {
-    const { classes, close, modalState, userMatchData, userMatchClassname, adminData } = this.props;
+    const { classes, close, modalState, userMatchData, userMatchClassname, adminData, selectedMatch } = this.props;
     const { userListVisible, searchUser, snackBarState, snackBarMessage, snackBarVariant, classSelected } = this.state
-    const { editNameState, editClassState, deleteState, anchorEl } = this.state
+    const { editNameState, editClassState, playerDisplayState, deleteState, anchorEl } = this.state
     return (
       <Modal
         open={modalState}
@@ -299,7 +348,7 @@ class UserListInMatchDialog extends React.Component {
       >
         <div className={classes.dialog} style={{ maxHeight: window.innerHeight }}>
           <div className={classes.dialogTitle}>
-            <Typography variant="h6">User list</Typography>
+            <Typography variant="h6">User list ({ " " + selectedMatch.matchname + " " })</Typography>
             {modalState ? (
               <IconButton aria-label="Close" className={classes.closeButton} onClick={this.handleClose}>
                 <CloseIcon fontSize="large"/>
@@ -308,62 +357,117 @@ class UserListInMatchDialog extends React.Component {
           </div>
           <Divider variant="middle" />
           <div style={{ display: 'flex', marginRight: 16, marginTop: 16 }}>
-            <Button
-              variant={ editNameState? "contained":"outlined" }
-              color={ editNameState? "primary":"inherit" }
-              className={classes.controlButton}
-              onClick={this.toggleEditName}>
-              <EditIcon className={classes.controlLeftIcon} />
-              Name
-            </Button>
-            <Button
-              variant={ editClassState? "contained":"outlined" }
-              color={ editClassState? "primary":"inherit" }
-              className={classes.controlButton}
-              onClick={this.toggleEditClass}>
-              <EditIcon className={classes.controlLeftIcon} />
-              Class
-            </Button>
-            <Grow in={editClassState} style={{ transitionDelay: editClassState ? '0ms' : '100ms' }}>
-              <Button
-                variant="outlined"
-                color="primary"
-                style={{ textTransform: 'none' }}
+            <Tooltip title="Edit name" placement="bottom">
+              <IconButton
+                color={ editNameState? "primary":"inherit" }
                 className={classes.controlButton}
-                onClick={this.handleMenu}>
-                { classSelected !== null ?
-                  userMatchClassname[classSelected]
-                  :'Select Class'
+                onClick={this.toggleEditName}>
+                <PersonIcon />
+              </IconButton>
+            </Tooltip>
+            <Tooltip title="Edit display" placement="bottom">
+              <IconButton
+                color={ playerDisplayState? "primary":"inherit" }
+                className={classes.controlButton}
+                onClick={this.togglePlayerDisplay}>
+                <PersonalVideoIcon />
+              </IconButton>
+            </Tooltip>
+            <Tooltip title="Edit class" placement="bottom">
+              <IconButton
+                color={ editClassState? "primary":"inherit" }
+                className={classes.controlButton}
+                onClick={this.toggleEditClass}>
+                <ClassIcon />
+              </IconButton>
+            </Tooltip>
+            { window.innerWidth > 650 &&
+              <React.Fragment>
+                { editClassState &&
+                  <Grow in={editClassState} style={{ transitionDelay: editClassState ? '0ms' : '100ms' }}>
+                    <Button
+                      variant="outlined"
+                      color="primary"
+                      style={{ textTransform: 'none' }}
+                      className={classes.controlButton}
+                      onClick={this.handleMenu}>
+                      { classSelected !== null ?
+                        userMatchClassname[classSelected]
+                        :'Select Class'
+                      }
+                    </Button>
+                  </Grow>
                 }
-              </Button>
-            </Grow>
-            <Menu
-              anchorEl={anchorEl}
-              open={Boolean(anchorEl)}
-              onClose={this.handleMenuClose}>
-              {userMatchClassname.map((d,i) =>
-                <MenuItem onClick={()=>this.handleSelectMenu(i)}>{d}</MenuItem>
-              )}
-            </Menu>
-            <Grow in={editClassState} style={{ transitionDelay: editClassState ? '100ms' : '0ms' }}>
-              <Button
-                variant="outlined"
-                color="primary"
-                className={classes.controlButton}
-                onClick={this.handleEditClass}>
-                Save
-              </Button>
-            </Grow>
+                <Menu
+                  anchorEl={anchorEl}
+                  open={Boolean(anchorEl)}
+                  onClose={this.handleMenuClose}>
+                  {userMatchClassname.map((d,i) =>
+                    <MenuItem onClick={()=>this.handleSelectMenu(i)}>{d}</MenuItem>
+                  )}
+                </Menu>
+                { editClassState &&
+                  <Grow in={editClassState} style={{ transitionDelay: editClassState ? '100ms' : '0ms' }}>
+                    <Button
+                      variant="outlined"
+                      color="primary"
+                      className={classes.controlButton}
+                      onClick={this.handleEditClass}>
+                      Save
+                    </Button>
+                  </Grow>
+                }
+              </React.Fragment>
+            }
             <div style={{ flex: 1 }}></div>
-            <Button
-              variant={ deleteState? "contained":"outlined" }
-              color={ deleteState? "primary":"inherit" }
-              className={classes.controlButton}
-              onClick={this.toggleDelete}>
-              <DeleteIcon className={classes.controlLeftIcon} />
-              Delete
-            </Button>
+            <Tooltip title="Delete player" placement="bottom">
+              <IconButton
+                color={ deleteState? "secondary":"inherit" }
+                className={classes.controlButton}
+                onClick={this.toggleDelete}>
+                <DeleteIcon />
+              </IconButton>
+            </Tooltip>
           </div>
+          { window.innerWidth < 650 &&
+            <div style={{ display: 'flex', marginRight: 16 }}>
+              { editClassState &&
+                <Grow in={editClassState} style={{ transitionDelay: editClassState ? '0ms' : '100ms' }}>
+                  <Button
+                    variant="outlined"
+                    color="primary"
+                    style={{ textTransform: 'none' }}
+                    className={classes.controlButton}
+                    onClick={this.handleMenu}>
+                    { classSelected !== null ?
+                      userMatchClassname[classSelected]
+                      :'Select Class'
+                    }
+                  </Button>
+                </Grow>
+              }
+              <Menu
+                anchorEl={anchorEl}
+                open={Boolean(anchorEl)}
+                onClose={this.handleMenuClose}>
+                {userMatchClassname.map((d,i) =>
+                  <MenuItem onClick={()=>this.handleSelectMenu(i)}>{d}</MenuItem>
+                )}
+              </Menu>
+              { editClassState &&
+                <Grow in={editClassState} style={{ transitionDelay: editClassState ? '100ms' : '0ms' }}>
+                  <Button
+                    variant="outlined"
+                    color="primary"
+                    className={classes.controlButton}
+                    onClick={this.handleEditClass}>
+                    Save
+                  </Button>
+                </Grow>
+              }
+            </div>
+          }
+
           <div className={classes.searchBox}>
             <TextField
               fullWidth
@@ -373,7 +477,7 @@ class UserListInMatchDialog extends React.Component {
               InputProps={{
                 endAdornment: (
                   <InputAdornment position="end">
-                    <IconButton>
+                    <IconButton disabled>
                       <SearchIcon />
                     </IconButton>
                   </InputAdornment>
@@ -381,7 +485,7 @@ class UserListInMatchDialog extends React.Component {
               }}
             />
           </div>
-          <div className={classes.dialogContent} style={{ maxHeight: window.innerHeight * .6 }}>
+          <div className={ window.innerWidth > 500 && classes.dialogContent} style={{ maxHeight: window.innerHeight * .6 }}>
             <List>
               { userMatchData ? userMatchData.filter((item)=>{
                   return (
@@ -394,7 +498,10 @@ class UserListInMatchDialog extends React.Component {
                   <ListItem
                     button={ !editNameState }
                     style={{ height: 56 }}
-                    onClick={()=>!editNameState ? this.handleEditClassChecked(d):null}>
+                    onClick={()=>
+                      ( editClassState && this.handleEditClassChecked(d)) ||
+                      ( playerDisplayState && this.handlePlayerDisplay(d) )
+                    }>
                     { editClassState ?
                       <Grow in={editClassState} style={{ transitionDelay: editClassState ? `${30 * i}ms` : '0ms' }}>
                         <Checkbox
@@ -406,10 +513,10 @@ class UserListInMatchDialog extends React.Component {
                       :<div style={{ width: 48 }}></div>
                     }
                     <ListItemText
-                      className={classes.userMatchItemName}
+                      style={{ width: window.innerWidth > 500 ?'40%':'100%' }}
                       primary={
                         editNameState ?
-                        <div style={{ display: 'flex'}}>
+                        <div style={{ display: 'flex', width: window.innerWidth < 500 ?'90%':'100%' }}>
                           <Input
                             defaultValue={d.fullname}
                             inputProps={{
@@ -429,10 +536,13 @@ class UserListInMatchDialog extends React.Component {
                           <Typography variant="subtitle1" style={{ width: '100%'}}>{d.fullname}</Typography>
                           <Typography variant="subtitle1" style={{ width: '100%'}}>{d.lastname}</Typography>
                         </div>
-                      }/>
-                    <ListItemText
-                      className={classes.userMatchItemClass}
-                      primary={userMatchClassname[d.classno]} />
+                      }
+                      secondary={ window.innerWidth < 500 && userMatchClassname[d.classno] }/>
+                    { window.innerWidth > 500 &&
+                      <ListItemText
+                        className={classes.userMatchItemClass}
+                        primary={userMatchClassname[d.classno]} />
+                    }
                     <ListItemSecondaryAction>
                       { deleteState ?
                         <IconButton onClick={()=>this.handleRemoveUser(d)}>
@@ -441,79 +551,26 @@ class UserListInMatchDialog extends React.Component {
                         :null
                       }
                       { editNameState ?
-                        <Button color="primary" onClick={()=>this.handleUserEdit(d)}>
+                        <Button
+                          size={ window.innerWidth < 500 ? "small":"default"}
+                          color="primary" onClick={()=>this.handleUserEdit(d)}>
                           Save
                         </Button>:null
                       }
-                    </ListItemSecondaryAction>
-                  </ListItem>
-                )://<p>Loading ...</p>
-                [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20]
-                .slice( 0 , userListVisible ).map((d, i) =>
-                  <ListItem
-                    button={ !editNameState }
-                    style={{ height: 56 }}
-                    onClick={()=>!editNameState ? this.handleEditClassChecked(d):null}>
-                    { editClassState ?
-                      <Grow in={editClassState} style={{ transitionDelay: editClassState ? `${30 * i}ms` : '0ms' }}>
+                      { playerDisplayState &&
                         <Checkbox
-                          checked={this.state.classChecked.indexOf(d) !== -1}
-                          disableRipple
-                          color="primary"
-                        />
-                      </Grow>
-                      :<div style={{ width: 48 }}></div>
-                    }
-                    <ListItemText
-                      className={classes.userMatchItemName}
-                      primary={
-                        editNameState ?
-                        <div style={{ display: 'flex'}}>
-                          <Input
-                            defaultValue={"fullname" + d}
-                            inputProps={{
-                              'aria-label': 'Description',
-                            }}
-                            onChange={(e)=>this.handleFullnameChange(e.target.value,d,i)}
+                          onChange={()=>this.handlePlayerDisplay(d)}
+                          checked={(d.display === 1)? true:false}
                           />
-                          <Input
-                            defaultValue={"lastname" + d}
-                            inputProps={{
-                              'aria-label': 'Description',
-                            }}
-                            onChange={(e)=>this.handleLastnameChange(e.target.value,d,i)}
-                          />
-                        </div>:
-                        <div style={{ display: 'flex'}}>
-                          <Typography variant="subtitle1" style={{ width: '100%'}}>{"fullname" + d}</Typography>
-                          <Typography variant="subtitle1" style={{ width: '100%'}}>{"lastname" + d}</Typography>
-                        </div>
-                      }
-                       />
-                    <ListItemText
-                      className={classes.userMatchItemClass}
-                      primary={"T" + d} />
-                    <ListItemSecondaryAction>
-                      { deleteState ?
-                        <IconButton>
-                          <DeleteIcon fontSize="small"/>
-                        </IconButton>
-                        :null
-                      }
-                      { editNameState ?
-                        <Button color="primary" onClick={()=>this.handleUserEdit(i)}>
-                          Save
-                        </Button>:null
                       }
                     </ListItemSecondaryAction>
                   </ListItem>
-
-                )
+                ):<p>Loading ...</p>
               }
             </List>
 
             { userMatchData &&
-              userListVisible < userMatchData.length ?
+              (userListVisible < userMatchData.length ?
               <Button
                 fullWidth
                 className={classes.loadmoreButton}
@@ -522,6 +579,7 @@ class UserListInMatchDialog extends React.Component {
                   <KeyboardArrowDownIcon disabled />
                 </IconButton>
               </Button>:
+              (userMatchData.length > 10  &&
               <Button
                 fullWidth
                 className={classes.loadmoreButton}
@@ -529,7 +587,7 @@ class UserListInMatchDialog extends React.Component {
                 <IconButton disabled>
                   <KeyboardArrowUpIcon disabled />
                 </IconButton>
-              </Button>
+              </Button>))
             }
           </div>
           <SnackBarAlert

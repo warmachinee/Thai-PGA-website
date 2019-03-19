@@ -72,7 +72,7 @@ class MenuAppBar extends React.Component {
         <Toolbar position="fixed" className={classes.appBar}>
           <Link to='/' style={{ textDecoration: 'none',color: 'white' }} className={classes.grow}>
             <Typography variant="h6" color="inherit">
-              Thai-PGA
+              ToffTime
             </Typography>
           </Link>
           { !isAuthenticated?

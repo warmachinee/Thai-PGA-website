@@ -133,7 +133,7 @@ class FieldEditorDialog extends React.Component {
     this.state.fieldScore[index] = parseInt(score)
   }
   async fetchDeleteField(){
-    const data = await fetchPostUrl('https://thai-pga.com/api/customfielddelete',{
+    const data = await fetchPostUrl('https://tofftime.com/api/customfielddelete',{
       userid: parseInt(this.props.adminData.id),
       fieldid: this.props.fieldEditData.fieldid,
     })
@@ -148,7 +148,7 @@ class FieldEditorDialog extends React.Component {
     }
   }
   async fetchEditField(){
-    const data = await fetchPostUrl('https://thai-pga.com/api/customfieldedit',{
+    const data = await fetchPostUrl('https://tofftime.com/api/customfieldedit',{
       userid: parseInt(this.props.adminData.id),
       fieldid: this.props.fieldEditData.fieldid,
       fieldname: this.state.fieldname,
@@ -165,7 +165,7 @@ class FieldEditorDialog extends React.Component {
     }
   }
   async fetchCreateField(){
-    const data = await fetchPostUrl('https://thai-pga.com/api/customfieldcreate',{
+    const data = await fetchPostUrl('https://tofftime.com/api/customfieldcreate',{
       userid: parseInt(this.props.adminData.id),
       fieldname: this.state.fieldname,
       score: this.state.fieldScore
@@ -182,7 +182,7 @@ class FieldEditorDialog extends React.Component {
     }
   }
   async fetchLoadField(){
-    const field = await fetchUrl('https://thai-pga.com/api/loadfield')
+    const field = await fetchUrl('https://tofftime.com/api/loadfield')
     let tempData = []
     for(var i = 0;i < field.fieldid.length;i++){
       tempData.push({

@@ -40,7 +40,8 @@ import blue from '@material-ui/core/colors/blue';
 
 const styles = theme => ({
   root: {
-    marginTop: window.innerWidth > 600 ? 64: 56
+    marginTop: window.innerWidth > 600 ? 64: 56,
+    marginBottom: 250
   },
   paper: {
     ...theme.mixins.gutters(),
@@ -86,6 +87,7 @@ class AdminPage extends Component {
           adminData={data}/>
         <EditMatchCard
           adminData={data}
+          handleSnackBar={this.handleSnackBar}
           afterCreateMatchData={afterCreateMatchData}/>
         <SnackBarAlert
           variant={snackBarVariant}

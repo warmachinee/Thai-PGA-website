@@ -126,7 +126,7 @@ class TabsMenu extends React.Component {
     this.setState({ adminModalState: false });
   };
   handleAdminSignin = async () =>{
-    const data = await fetchPostUrl('https://thai-pga.com/login',{
+    const data = await fetchPostUrl('https://tofftime.com/login',{
       username: this.state.adminUsername,
       password: this.state.adminPassword
     })
@@ -174,7 +174,7 @@ class TabsMenu extends React.Component {
     }
   }
   handleSignIn = async () =>{
-    const data = await fetchPostUrl('https://thai-pga.com/login',{
+    const data = await fetchPostUrl('https://tofftime.com/login',{
       username: this.state.username,
       password: this.state.password
     })

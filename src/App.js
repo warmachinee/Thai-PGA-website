@@ -31,7 +31,7 @@ class App extends Component {
     }
   }
   async doFetchData(){
-    const data = await fetchUrl('https://www.thai-pga.com/api/loadmainmatch')
+    const data = await fetchUrl('https://www.tofftime.com/api/loadmainmatch')
     this.setState({dataFromFetch: data})
   }
 

@@ -106,6 +106,17 @@ function MatchDetail(props){
         margin: 'auto',
         width: window.innerWidth > 600 ? 36:28
       }
+      const rowStylePar = {
+        boxSizing: 'border-box',
+        paddingRight: 8,
+        textAlign: 'right',
+        fontSize: window.innerWidth > 600 ? 14:12,
+        margin: 'auto',
+        width: window.innerWidth > 600 ? 36:28,
+        color: blue[800],
+        fontWeight: 'bold'
+      }
+
       function fieldscoreSum(){
         let IN = 0;
         let OUT = 0;
@@ -375,7 +386,7 @@ function MatchDetail(props){
                 window.innerWidth>750?400:
                 window.innerWidth>600?300:
                 window.innerWidth>450?250:
-                window.innerWidth>320?150:100,paddingLeft: 8,
+                window.innerWidth>320?150:80,paddingLeft: 8,
                 textOverflow: 'ellipsis', overflow: 'hidden',whiteSpace: 'nowrap',
                 fontSize: window.innerWidth > 600 ? 14:12,
               }}>
@@ -385,48 +396,93 @@ function MatchDetail(props){
             <div style={rowStyle}>{data? data[index].out:'OUT'}</div>
             <div style={rowStyle}>{data? data[index].in:'IN'}</div>
             <div style={rowStyle}>{data? data[index].gross:'TOT'}</div>
+            <div style={rowStylePar}>{data? data[index].par:'PAR'}</div>
           </ExpansionPanelSummary>
           <ExpansionPanelDetails style={{padding: '0 8px',display: 'flex'}}>
             { window.innerWidth > 670? moreThan670 : lessThan670 }
           </ExpansionPanelDetails>
-          <ExpansionPanelActions>
-            <div style={{
-                fontSize: window.innerWidth > 500? 16:12,
-                border: `1.5px solid ${grey[700]}`, padding: window.innerWidth > 500? '8px 4px':'8px 4px',
-                marginRight: 4
-              }}>Over</div>
-            <div style={{
-                fontSize: window.innerWidth > 500? 16:12,
-                border: `1.5px solid ${grey[700]}`, padding: window.innerWidth > 500? '12px 2px':'12px 4px',
-                borderRadius: '50%'
-              }}>Under</div>
-            <div style={{ flex: 1}}></div>
-            <Chip
-              label="Hole"
-              className={classes.chip}
-              component="a"
-              style={{
-                backgroundColor: palette.holeBG, color: 'white', fontWeight: '500', letterSpacing: 1,
-                fontSize: window.innerWidth > 500? 16:12, padding: 4
-              }}/>
-            <Chip
-              label="Par"
-              className={classes.chip}
-              component="a"
-              style={{
-                backgroundColor: palette.parBG, fontWeight: '500', letterSpacing: 1,
-                fontSize: window.innerWidth > 500? 16:12, padding: 4
-              }}/>
-            <Chip
-              label="Score"
-              className={classes.chip}
-              component="a"
-              style={{
-                backgroundColor: palette.scoreBG, fontWeight: '500', letterSpacing: 1,
-                fontSize: window.innerWidth > 500? 16:12, padding: 4,
-                border: '1px solid black'
-              }}/>
-          </ExpansionPanelActions>
+          { window.innerWidth > 500 ?
+            <ExpansionPanelActions>
+              <div style={{
+                  fontSize: window.innerWidth > 500? 16:12,
+                  border: `1.5px solid ${grey[700]}`, padding: window.innerWidth > 500? '8px 4px':'8px 4px',
+                  marginRight: 4
+                }}>Over</div>
+              <div style={{
+                  fontSize: window.innerWidth > 500? 16:12,
+                  border: `1.5px solid ${grey[700]}`, padding: window.innerWidth > 500? '12px 2px':'12px 4px',
+                  borderRadius: '50%'
+                }}>Under</div>
+              <div style={{ flex: 1}}></div>
+              <Chip
+                label="Hole"
+                className={classes.chip}
+                component="a"
+                style={{
+                  backgroundColor: palette.holeBG, color: 'white', fontWeight: '500', letterSpacing: 1,
+                  fontSize: window.innerWidth > 500? 16:12, padding: 4
+                }}/>
+              <Chip
+                label="Par"
+                className={classes.chip}
+                component="a"
+                style={{
+                  backgroundColor: palette.parBG, fontWeight: '500', letterSpacing: 1,
+                  fontSize: window.innerWidth > 500? 16:12, padding: 4
+                }}/>
+              <Chip
+                label="Score"
+                className={classes.chip}
+                component="a"
+                style={{
+                  backgroundColor: palette.scoreBG, fontWeight: '500', letterSpacing: 1,
+                  fontSize: window.innerWidth > 500? 16:12, padding: 4,
+                  border: '1px solid black'
+                }}/>
+            </ExpansionPanelActions>:
+            <ExpansionPanelActions style={{ flexDirection: 'column'}}>
+              <div>
+                <div style={{
+                    fontSize: window.innerWidth > 500? 16:12,
+                    border: `1.5px solid ${grey[700]}`, padding: window.innerWidth > 500? '8px 4px':'8px 4px',
+                    marginRight: 4
+                  }}>Over</div>
+                <div style={{
+                    fontSize: window.innerWidth > 500? 16:12,
+                    border: `1.5px solid ${grey[700]}`, padding: window.innerWidth > 500? '12px 2px':'12px 4px',
+                    borderRadius: '50%'
+                  }}>Under</div>
+              </div>
+              <div>
+                <Chip
+                  label="Hole"
+                  className={classes.chip}
+                  component="a"
+                  style={{
+                    backgroundColor: palette.holeBG, color: 'white', fontWeight: '500', letterSpacing: 1,
+                    fontSize: window.innerWidth > 500? 16:12, padding: 4
+                  }}/>
+                <Chip
+                  label="Par"
+                  className={classes.chip}
+                  component="a"
+                  style={{
+                    backgroundColor: palette.parBG, fontWeight: '500', letterSpacing: 1,
+                    fontSize: window.innerWidth > 500? 16:12, padding: 4
+                  }}/>
+                <Chip
+                  label="Score"
+                  className={classes.chip}
+                  component="a"
+                  style={{
+                    backgroundColor: palette.scoreBG, fontWeight: '500', letterSpacing: 1,
+                    fontSize: window.innerWidth > 500? 16:12, padding: 4,
+                    border: '1px solid black'
+                  }}/>
+              </div>
+            </ExpansionPanelActions>
+          }
+
         </ExpansionPanel>
       )
     }
@@ -470,7 +526,7 @@ function MatchDetail(props){
                   window.innerWidth > 750 ? 400:
                   window.innerWidth > 600 ? 300:
                   window.innerWidth > 450 ? 250:
-                  window.innerWidth > 320 ? 150:100, paddingLeft: 8,
+                  window.innerWidth > 320 ? 150:80, paddingLeft: 8,
                   textOverflow: 'ellipsis', overflow: 'hidden',whiteSpace: 'nowrap',
                   fontSize: window.innerWidth > 600 ? 14:12,
                   margin: 'auto'  }}>
@@ -480,6 +536,7 @@ function MatchDetail(props){
               <div style={rowLabelStyle}>{'OUT'}</div>
               <div style={rowLabelStyle}>{'IN'}</div>
               <div style={rowLabelStyle}>{'TOT'}</div>
+              <div style={rowLabelStyle}>{'PAR'}</div>
             </ExpansionPanelSummary>
           </ExpansionPanel>
           {data.length? data.map( (d,i) =>
@@ -505,6 +562,7 @@ function MatchDetail(props){
               in: data[matchParams].in ? data[matchParams].in[j]: 0,
               out: data[matchParams].out ? data[matchParams].out[j]: 0,
               gross: data[matchParams].gross ? data[matchParams].gross[j]: 0,
+              par: data[matchParams].par ? data[matchParams].par[j]: 0,
               rank: data[matchParams].rank ? data[matchParams].rank[j]: 0,
               holescore:
               data[matchParams].holescore ?
